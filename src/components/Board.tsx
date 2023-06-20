@@ -2,11 +2,30 @@ import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { AiOutlineClose } from "react-icons/ai";
 import "./Board.css";
-import { set, dbRef, db, get, child, ref } from "../Fire";
+import {
+  set,
+  dbRef,
+  db,
+  get,
+  child,
+  ref,
+  signOut,
+  auth,
+  // dataRef,
+} from "../Fire";
+import { useNavigate } from "react-router-dom";
 
-function Board(user: { uid: string }) {
+function Board({
+  user,
+  setUser,
+}: {
+  user: string;
+  setUser: (uid: string) => void;
+}) {
+  const navigate = useNavigate();
+
   useEffect(() => {
-    get(child(dbRef, user.uid))
+    get(child(dbRef, user))
       .then((snapshot) => {
         if (snapshot.exists()) {
           setCardTitle(snapshot.val().CardTitle);
@@ -20,12 +39,9 @@ function Board(user: { uid: string }) {
       });
     // console.log(user);
   }, []);
+
   type titleObj = { [key: string]: string };
-  const [cardTitle, setCardTitle] = useState<titleObj>({
-    // title1234: "Sunday",
-    // title2124: "Monday",
-    // title3623: "Tuesday",
-  });
+  const [cardTitle, setCardTitle] = useState<titleObj>({});
 
   type TodoType = {
     id: number | string;
@@ -37,25 +53,22 @@ function Board(user: { uid: string }) {
   type Column = typeof cardTitle;
   type ColumnType = keyof Column;
 
-  // const sampleTodos: TodoType[] = [
-  //   {
-  //     id: 12412412412,
-  //     title: "Clean room",
-  //     column: "title3623",
-  //     sortIndex: 1,
-  //   },
-  //   {
-  //     id: 141414124144,
-  //     title: "Do workout",
-  //     column: "title2124",
-  //     sortIndex: 2,
-  //   },
-  // ];
   const [todos, setTodos] = useState<TodoType[]>([]);
 
   const columnMap = Object.keys(cardTitle) as Array<ColumnType>;
 
   const draggedTodoItem = React.useRef<any>(null);
+
+  const logout = (): void => {
+    signOut(auth)
+      .then(() => {
+        setUser("");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    navigate("/login");
+  };
 
   const handleColumnDrop = (column: ColumnType) => {
     const index = todos.findIndex(
@@ -64,13 +77,16 @@ function Board(user: { uid: string }) {
     const tempTodos = [...todos];
     tempTodos[index].column = column;
 
-    set(ref(db, user.uid + "/Tasks"), tempTodos)
+    set(ref(db, user + "/Tasks"), tempTodos)
       .then(() => {
         setTodos(tempTodos);
       })
       .catch((error) => {
         console.error(error);
       });
+
+    // let data = dataRef.ref(user + "/Tasks");
+    // console.log(data);
   };
 
   const handleAddCard = () => {
@@ -78,7 +94,7 @@ function Board(user: { uid: string }) {
       ...cardTitle,
       ["title" + uuidv4()]: "Title",
     };
-    set(ref(db, user.uid + "/CardTitle"), updatedCardTitle)
+    set(ref(db, user + "/CardTitle"), updatedCardTitle)
       .then(() => {
         setCardTitle(updatedCardTitle);
       })
@@ -93,10 +109,10 @@ function Board(user: { uid: string }) {
 
     const updatedTasks = todos.filter((todo) => todo.column !== cardKey);
 
-    set(ref(db, user.uid + "/CardTitle"), updatedCardTitle)
+    set(ref(db, user + "/CardTitle"), updatedCardTitle)
       .then(() => {
         setCardTitle(updatedCardTitle);
-        set(ref(db, user.uid + "/Tasks"), updatedTasks)
+        set(ref(db, user + "/Tasks"), updatedTasks)
           .then(() => {
             setTodos(updatedTasks);
           })
@@ -112,7 +128,7 @@ function Board(user: { uid: string }) {
   const handleEditTitle = (titleKey: string | number, newTitle: string) => {
     const newCardTitle = { ...cardTitle };
     newCardTitle[titleKey] = newTitle;
-    set(ref(db, user.uid + "/CardTitle"), newCardTitle)
+    set(ref(db, user + "/CardTitle"), newCardTitle)
       .then(() => {
         setCardTitle(newCardTitle);
       })
@@ -129,7 +145,7 @@ function Board(user: { uid: string }) {
       sortIndex: todos.length + 1,
     };
     const updatedTasks = [...todos, newTodo];
-    set(ref(db, user.uid + "/Tasks"), updatedTasks)
+    set(ref(db, user + "/Tasks"), updatedTasks)
       .then(() => {
         setTodos(updatedTasks);
       })
@@ -140,7 +156,7 @@ function Board(user: { uid: string }) {
 
   const handleDeleteTodo = (todoId: string | number) => {
     const updatedTodos = todos.filter((todo) => todo.id !== todoId);
-    set(ref(db, user.uid + "/Tasks"), updatedTodos)
+    set(ref(db, user + "/Tasks"), updatedTodos)
       .then(() => {
         setTodos(updatedTodos);
       })
@@ -156,7 +172,7 @@ function Board(user: { uid: string }) {
       }
       return todo;
     });
-    set(ref(db, user.uid + "/Tasks"), updatedTodos)
+    set(ref(db, user + "/Tasks"), updatedTodos)
       .then(() => {
         setTodos(updatedTodos);
       })
@@ -238,6 +254,9 @@ function Board(user: { uid: string }) {
           + Add Card
         </button>
       </div>
+      <button className="logout-btn" onClick={() => logout()}>
+        Logout
+      </button>
     </div>
   );
 }

@@ -13,13 +13,11 @@ function Login({ setUser }: LoginProps) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  //   const [error, setError] = useState("");
 
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        // console.log(user.uid);
         setUser(user.uid);
         navigate("/task-board");
 

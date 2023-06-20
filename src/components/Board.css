@@ -71,7 +71,7 @@
   color: white;
   background-color: inherit;
   border: none;
-  width: 140px;
+  width: 160px;
   cursor: grab;
 }
 
@@ -121,4 +121,19 @@
   color: green;
   background-color: wheat;
   border: 1px solid green;
+}
+
+.logout-btn {
+  font-weight: 600;
+  position: absolute;
+  top: 60px;
+  right: 80px;
+  background-color: #2b2222;
+  color: white;
+  border: 1px solid white;
+  border-radius: 10px;
+}
+.logout-btn:hover {
+  color: red;
+  background-color: white;
 }
