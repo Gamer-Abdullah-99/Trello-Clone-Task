@@ -1,0 +1,124 @@
+.board-container {
+  padding-top: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.board-container > h2 {
+  color: white;
+  font-weight: 700;
+}
+
+.board-textWrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}
+
+.board-column {
+  display: flex;
+  width: 200px;
+  background-color: #2b2222;
+  opacity: 0.85;
+  border-radius: 10px;
+  min-height: 400px;
+  padding-bottom: 20px;
+}
+
+.board-columnItems {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.title-span {
+  display: flex;
+  flex-direction: row;
+  background-color: black;
+  border-radius: 5px 5px 0px 0px;
+  width: 200px;
+}
+
+.board-title {
+  color: aliceblue;
+  background-color: black;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 180px;
+  border-radius: 5px 5px 0px 0px;
+  border: none;
+  font-size: 20px;
+  text-align: center;
+}
+
+.board-taskList {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px;
+  gap: 10px;
+}
+
+.board-editInput {
+  color: white;
+  background-color: inherit;
+  border: none;
+  width: 140px;
+  cursor: grab;
+}
+
+.board-editInput:focus {
+  background-color: white;
+  color: black;
+}
+
+.board-delButton {
+  color: white;
+  width: 10px;
+  height: 15px;
+}
+
+.board-delButton:hover {
+  cursor: pointer;
+  color: red;
+}
+
+.board-addButton {
+  margin-top: 10px;
+  padding: 5px;
+  width: fit-content;
+  align-self: center;
+  border-radius: 10px;
+  border: 1px solid white;
+  color: wheat;
+  background-color: inherit;
+}
+
+.board-addButton:hover {
+  color: #2b2222;
+  background-color: white;
+}
+
+.board-addCard {
+  background-color: #2b2222;
+  color: white;
+  padding: 10px;
+  border: 1px solid white;
+  border-radius: 10px;
+  align-self: flex-start;
+  margin-top: 35px;
+}
+
+.board-addCard:hover {
+  color: green;
+  background-color: wheat;
+  border: 1px solid green;
+}
