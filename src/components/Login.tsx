@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import "./Login.css";
 import { auth, signInWithEmailAndPassword } from "../Fire";
 import { useNavigate } from "react-router-dom";
-// import { set, ref, db } from "../Fire";
 
 type LoginProps = {
   setUser: (uid: string) => void;
