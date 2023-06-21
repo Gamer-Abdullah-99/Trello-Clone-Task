@@ -4,7 +4,6 @@ import Board from "./components/Board";
 import Login from "./components/Login";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { onAuthStateChanged, auth } from "./Fire";
-import { setuid } from "process";
 
 function App() {
   const navigate = useNavigate();
