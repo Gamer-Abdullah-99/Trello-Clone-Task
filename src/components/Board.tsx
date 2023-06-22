@@ -1,30 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { AiOutlineClose } from "react-icons/ai";
 import "./Board.css";
-import {
-  set,
-  dbRef,
-  db,
-  get,
-  child,
-  ref,
-  signOut,
-  auth,
-  // dataRef,
-  onValue,
-} from "../Fire";
+import { db, ref, signOut, auth, onValue } from "../Fire";
 import { useNavigate } from "react-router-dom";
+import {
+  handleColumnDrop,
+  handleAddCard,
+  handleDeleteCard,
+  handleEditTitle,
+  handleAddTask,
+  handleDeleteTask,
+  handleEditTask,
+  handleLogout,
+} from "../functions/Firebase Utilities";
+import { TodoType, titleObj, ColumnType, BoardProps } from "../types";
 
-function Board({
-  user,
-  setUser,
-}: {
-  user: string;
-  setUser: (uid: string) => void;
-}) {
-  const navigate = useNavigate();
-
+function Board({ user, setUser }: BoardProps) {
   useEffect(() => {
     const DbRef = ref(db, user + "/");
     onValue(DbRef, (snapshot) => {
@@ -38,147 +29,15 @@ function Board({
     });
   }, []);
 
-  type titleObj = { [key: string]: string };
+  const navigate = useNavigate();
+
   const [cardTitle, setCardTitle] = useState<titleObj>({});
-
-  type TodoType = {
-    id: number | string;
-    title: string;
-    column: ColumnType;
-    sortIndex: number;
-  };
-
-  type Column = typeof cardTitle;
-  type ColumnType = keyof Column;
 
   const [todos, setTodos] = useState<TodoType[]>([]);
 
   const columnMap = Object.keys(cardTitle) as Array<ColumnType>;
 
   const draggedTodoItem = React.useRef<any>(null);
-
-  const logout = (): void => {
-    signOut(auth)
-      .then(() => {
-        setUser("");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-    navigate("/login");
-  };
-
-  const handleColumnDrop = (column: ColumnType) => {
-    const index = todos.findIndex(
-      (todo) => todo.id === draggedTodoItem.current
-    );
-    const tempTodos = [...todos];
-    tempTodos[index].column = column;
-
-    set(ref(db, user + "/Tasks"), tempTodos)
-      .then(() => {
-        setTodos(tempTodos);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-
-    // let data = dataRef.ref(user + "/Tasks");
-    // console.log(data);
-  };
-
-  const handleAddCard = () => {
-    const updatedCardTitle = {
-      ...cardTitle,
-      ["title" + uuidv4()]: "Title",
-    };
-    set(ref(db, user + "/CardTitle"), updatedCardTitle)
-      .then(() => {
-        setCardTitle(updatedCardTitle);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleDeleteCard = (cardKey: string | number) => {
-    const updatedCardTitle = { ...cardTitle };
-    delete updatedCardTitle[cardKey];
-
-    const updatedTasks = todos.filter((todo) => todo.column !== cardKey);
-
-    set(ref(db, user + "/CardTitle"), updatedCardTitle)
-      .then(() => {
-        setCardTitle(updatedCardTitle);
-        set(ref(db, user + "/Tasks"), updatedTasks)
-          .then(() => {
-            setTodos(updatedTasks);
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleEditTitle = (titleKey: string | number, newTitle: string) => {
-    const newCardTitle = { ...cardTitle };
-    newCardTitle[titleKey] = newTitle;
-    set(ref(db, user + "/CardTitle"), newCardTitle)
-      .then(() => {
-        setCardTitle(newCardTitle);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleAddTask = (column: ColumnType) => {
-    const newTodo: TodoType = {
-      id: uuidv4(),
-      title: "Task",
-      column: column,
-      sortIndex: todos.length + 1,
-    };
-    const updatedTasks = [...todos, newTodo];
-    set(ref(db, user + "/Tasks"), updatedTasks)
-      .then(() => {
-        setTodos(updatedTasks);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleDeleteTodo = (todoId: string | number) => {
-    const updatedTodos = todos.filter((todo) => todo.id !== todoId);
-    set(ref(db, user + "/Tasks"), updatedTodos)
-      .then(() => {
-        setTodos(updatedTodos);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleEditTodo = (todoId: string | number, newTitle: string) => {
-    const updatedTodos = todos.map((todo) => {
-      if (todo.id === todoId) {
-        return { ...todo, title: newTitle };
-      }
-      return todo;
-    });
-    set(ref(db, user + "/Tasks"), updatedTodos)
-      .then(() => {
-        setTodos(updatedTodos);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-    // setTodos(updatedTodos);
-  };
 
   return (
     <div className="board-container">
@@ -189,7 +48,15 @@ function Board({
             <div
               className="board-columnItems"
               onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => handleColumnDrop(column)}
+              onDrop={(e) =>
+                handleColumnDrop({
+                  column,
+                  user,
+                  draggedTodoItem,
+                  todos,
+                  setTodos,
+                })
+              }
             >
               <span className="title-span">
                 <input
@@ -197,15 +64,36 @@ function Board({
                   type="text"
                   value={cardTitle[column]}
                   onChange={(e) => {
-                    handleEditTitle(column, e.target.value);
+                    handleEditTitle({
+                      column,
+                      newTitle: e.target.value,
+                      user,
+                      cardTitle,
+                      setCardTitle,
+                    });
                   }}
                   onBlur={(e) => {
-                    handleEditTitle(column, e.target.value);
+                    handleEditTitle({
+                      column,
+                      newTitle: e.target.value,
+                      user,
+                      cardTitle,
+                      setCardTitle,
+                    });
                   }}
                 />
                 <p
                   className="board-delButton"
-                  onClick={() => handleDeleteCard(column)}
+                  onClick={() =>
+                    handleDeleteCard({
+                      column,
+                      user,
+                      todos,
+                      cardTitle,
+                      setCardTitle,
+                      setTodos,
+                    })
+                  }
                 >
                   <AiOutlineClose />
                 </p>
@@ -224,14 +112,35 @@ function Board({
                       className="board-editInput"
                       type="text"
                       value={todo.title}
-                      onChange={(e) => handleEditTodo(todo.id, e.target.value)}
+                      onChange={(e) =>
+                        handleEditTask({
+                          todoId: todo.id,
+                          newTitle: e.target.value,
+                          user,
+                          todos,
+                          setTodos,
+                        })
+                      }
                       onBlur={(e) => {
-                        handleEditTodo(todo.id, e.target.value);
+                        handleEditTask({
+                          todoId: todo.id,
+                          newTitle: e.target.value,
+                          user,
+                          todos,
+                          setTodos,
+                        });
                       }}
                     />
                     <p
                       className="board-delButton"
-                      onClick={() => handleDeleteTodo(todo.id)}
+                      onClick={() =>
+                        handleDeleteTask({
+                          todoId: todo.id,
+                          user,
+                          todos,
+                          setTodos,
+                        })
+                      }
                     >
                       <AiOutlineClose />
                     </p>
@@ -240,7 +149,7 @@ function Board({
               <button
                 className="board-addButton"
                 onClick={() => {
-                  handleAddTask(column);
+                  handleAddTask({ column, user, todos, setTodos });
                 }}
               >
                 + Add Task
@@ -248,11 +157,17 @@ function Board({
             </div>
           </div>
         ))}
-        <button className="board-addCard" onClick={handleAddCard}>
+        <button
+          className="board-addCard"
+          onClick={() => handleAddCard({ user, cardTitle, setCardTitle })}
+        >
           + Add Card
         </button>
       </div>
-      <button className="logout-btn" onClick={() => logout()}>
+      <button
+        className="logout-btn"
+        onClick={() => handleLogout({ setUser, navigate })}
+      >
         Logout
       </button>
     </div>
