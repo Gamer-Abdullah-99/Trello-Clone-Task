@@ -12,6 +12,7 @@ import {
   signOut,
   auth,
   // dataRef,
+  onValue,
 } from "../Fire";
 import { useNavigate } from "react-router-dom";
 
@@ -25,19 +26,16 @@ function Board({
   const navigate = useNavigate();
 
   useEffect(() => {
-    get(child(dbRef, user))
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          setCardTitle(snapshot.val().CardTitle);
-          setTodos(snapshot.val().Tasks);
-        } else {
-          console.log("No data available");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-    // console.log(user);
+    const DbRef = ref(db, user + "/");
+    onValue(DbRef, (snapshot) => {
+      const data = snapshot.val();
+      if (snapshot.exists()) {
+        setCardTitle(data.CardTitle);
+        setTodos(data.Tasks);
+      } else {
+        console.log("No data available");
+      }
+    });
   }, []);
 
   type titleObj = { [key: string]: string };
