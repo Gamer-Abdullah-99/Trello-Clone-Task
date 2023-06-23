@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import Board from "./components/Board";
-import Login from "./components/Login";
+import Board from "./pages/Board/Board";
+import Login from "./pages/Login/Login";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import { onAuthStateChanged, auth } from "./Fire";
+import { onAuthStateChanged, auth } from "./functions/Fire";
 
 function App() {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ function App() {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const uid = user.uid;
-        setUser(user.uid);
+        setUser(uid);
       } else {
         navigate("/login");
       }

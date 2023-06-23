@@ -1,0 +1,48 @@
+.task-taskList {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px;
+  gap: 10px;
+}
+
+.task-editInput {
+  color: white;
+  background-color: inherit;
+  border: none;
+  width: 160px;
+  cursor: grab;
+}
+
+.task-editInput:focus {
+  background-color: white;
+  color: black;
+}
+
+.task-delButton {
+  color: white;
+  width: 10px;
+  height: 15px;
+}
+
+.task-delButton:hover {
+  cursor: pointer;
+  color: red;
+}
+
+.task-addButton {
+  margin-top: 10px;
+  padding: 5px;
+  width: fit-content;
+  align-self: center;
+  border-radius: 10px;
+  border: 1px solid white;
+  color: wheat;
+  background-color: inherit;
+}
+
+.task-addButton:hover {
+  color: #2b2222;
+  background-color: white;
+}

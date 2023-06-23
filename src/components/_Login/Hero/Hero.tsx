@@ -1,15 +1,17 @@
-import React, { useId, useState } from "react";
-import "./Login.css";
-import { auth, signInWithEmailAndPassword } from "../Fire";
+import React from "react";
+import "./Hero.css";
+import { handleLogin } from "../../../functions/Firebase Utilities";
+import { LoginHeroProps } from "../../../functions/types";
 import { useNavigate } from "react-router-dom";
-import { handleLogin, handleLogout } from "../functions/Firebase Utilities";
-import { LoginProps } from "../types";
 
-function Login({ setUser }: LoginProps) {
+const Hero: React.FC<LoginHeroProps> = ({
+  setUser,
+  email,
+  setEmail,
+  password,
+  setPassword,
+}) => {
   const navigate = useNavigate();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   return (
     <div className="login-container">
@@ -43,6 +45,6 @@ function Login({ setUser }: LoginProps) {
       </div>
     </div>
   );
-}
+};
 
-export default Login;
+export default Hero;

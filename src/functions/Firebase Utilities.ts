@@ -1,4 +1,3 @@
-import React from "react";
 import {
   set,
   ref,
@@ -6,7 +5,7 @@ import {
   signOut,
   auth,
   signInWithEmailAndPassword,
-} from "../Fire";
+} from "./Fire";
 import { v4 as uuidv4 } from "uuid";
 import {
   TodoType,
@@ -20,7 +19,7 @@ import {
   EditTask,
   Login,
   Logout,
-} from "../types";
+} from "./types";
 
 //User Functions
 

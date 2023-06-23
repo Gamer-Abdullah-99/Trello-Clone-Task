@@ -1,0 +1,14 @@
+.board-container {
+  overflow-x: auto;
+  padding: 50px 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.board-container > h2 {
+  color: white;
+  font-weight: 700;
+}
